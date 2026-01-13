@@ -1,5 +1,5 @@
 """
-Docstring do projeto
+Sistema Financeiro Imutável com Tuplas
 """
 
 # ============================
@@ -18,133 +18,93 @@ Cada transação é uma tupla imutável com exatamente 5 posições:
 2 - valor (float)
 3 - data_hora (str)
 4 - descricao (str)
-
-A ordem e a quantidade de campos NÃO devem ser alteradas.
 """
 
-# O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
 
-def criar_transacao(transacao_id,tipo,valor,data_hora,descricao):
-    """
-    Cria e retorna uma transação financeira imutável.
+def criar_transacao(transacao_id, tipo, valor, data_hora, descricao):
+    return (transacao_id, tipo, valor, data_hora, descricao)
 
-    Uma transação é representada por uma tupla com estrutura fixa:
-    (transacao_id, tipo, valor, data_hora, descricao)
-    """
-    return (transacao_id,tipo,valor,data_hora,descricao)
-# O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
-
-def registrar_transacao(banco_atual,transacao):
-    """
-    Registra uma nova transação no banco de dados imutável.
-
-    Retorna um novo banco de dados, sem alterar o banco original.
-    """
-    return banco_atual+ (transacao,) 
-   # O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
- 
-def listar_transacoes(banco):
-    """
-    Lista todas as transações do banco de dados imutável.
-    """
-
-    for transacao in banco:
-        print(transacao) 
-# O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
 
 def calcular_saldo(banco):
-     """
-    Calcula o saldo com base no histórico de transações.
-    """
-     saldo=0
+    saldo = 0
+    for transacao in banco:
+        _, tipo, valor, _, _ = transacao
+        if tipo == TIPO_ENTRADA:
+            saldo += valor
+        elif tipo == TIPO_SAIDA:
+            saldo -= valor
+    return saldo
 
-     for transacao in banco:
-        _, tipo,valor,_,=transacao
-
-        if tipo==TIPO_ENTRADA:
-            saldo+=valor
-        elif tipo==TIPO_SAIDA:
-            saldo-=valor
-        return saldo
-     # O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
 
 def validar_tipo_transacao(tipo):
-        """
-    Valida se o tipo da transação é permitido.
-    """
-        if tipo not in (TIPO_ENTRADA,TIPO_SAIDA):
-            raise ValueError('tipo de transação invalida.')
-  # O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
-      
+    if tipo not in (TIPO_ENTRADA, TIPO_SAIDA):
+        raise ValueError("Tipo de transação inválido.")
+
+
 def validar_valor(valor):
-     """
-    Valida se o valor da transação é válido.
-    """
-     if not isinstance(valor,(int,float)):
-         raise ValueError('valor deve ser numerico')
-     
-     if valor<=0:
-         raise ValueError('valor deve ser maior que zero:\n')
- # O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
-    
-def validar_saldo_para_saida(saldo_atual,valor):
-      """
-    Impede que uma transação de saída gere saldo negativo.
-    """
-      if valor>saldo_atual:
-           raise ValueError('saldo insuficiente para realizar a saida')
-# O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
+    if not isinstance(valor, (int, float)):
+        raise ValueError("Valor deve ser numérico.")
+    if valor <= 0:
+        raise ValueError("Valor deve ser maior que zero.")
 
-def registrar_transacao(banco,transacao_id,tipo,valor,data_hora,descricao):
-     """
-    Registra uma transação após validar todas as regras de negócio.
-    Retorna um novo banco (imutável).
-    """
-     validar_tipo_transacao(tipo)
-     validar_valor(valor)
 
-     saldo_atual=calcular_saldo(banco)
+def validar_saldo_para_saida(saldo_atual, valor):
+    if valor > saldo_atual:
+        raise ValueError("Saldo insuficiente para realizar a saída.")
 
-     if tipo==TIPO_SAIDA:
-            (saldo_atual,valor)
-            nova_transacao=criar_transacao(transacao_id,tipo,valor,data_hora,descricao)
-            return banco+(nova_transacao,)
-     
+
+def registrar_transacao(banco, transacao_id, tipo, valor, data_hora, descricao):
+    validar_tipo_transacao(tipo)
+    validar_valor(valor)
+
+    saldo_atual = calcular_saldo(banco)
+
+    if tipo == TIPO_SAIDA:
+        validar_saldo_para_saida(saldo_atual, valor)
+
+    nova_transacao = criar_transacao(
+        transacao_id, tipo, valor, data_hora, descricao
+    )
+
+    return banco + (nova_transacao,)
+
+
+def listar_transacoes(banco):
+    if not banco:
+        print("Nenhuma transação registrada.")
+        return
+
+    for transacao in banco:
+        print(transacao)
+
+
 def exibir_menu():
-    print("\n=== SISTEMAA FINANCEIRO IMUTÁVEL === ")
-    print('1- REGISTRAR ENTRADA')
-    print('2- REGISTRAR SAÍDA')
-    print('3- VER SALDO')
-    print('4- VER HISTÓRICO')
-    print('0- SAIR')
-  # O banco de dados é imutável.
-# Sempre retornamos uma NOVA tupla.
-   
+    print("\n=== SISTEMA FINANCEIRO IMUTÁVEL ===")
+    print("1 - Registrar ENTRADA")
+    print("2 - Registrar SAÍDA")
+    print("3 - Ver SALDO")
+    print("4 - Ver HISTÓRICO")
+    print("0 - Sair")
+
+
 def executar_sistema():
-    banco=()
-    contador_id=1
+    banco = ()
+    contador_id = 1
 
     while True:
-            exibir_menu()
-            opcao=input('escolha uma opção:')
+        exibir_menu()
+        opcao = input("Escolha uma opção: ")
 
-            if opcao=="0":
-              print('Encerrando sistema...')
-              break
-            elif opcao == "1":
-                valor = float(input("Valor da entrada: "))
-                descricao = input("Descrição: ")
-                data_hora = input("Data/Hora: ")
+        if opcao == "0":
+            print("Encerrando sistema...")
+            break
 
-                banco = registrar_transacao(
+        elif opcao == "1":
+            valor = float(input("Valor da entrada: "))
+            descricao = input("Descrição: ")
+            data_hora = input("Data/Hora: ")
+
+            banco = registrar_transacao(
                 banco,
                 contador_id,
                 TIPO_ENTRADA,
@@ -153,12 +113,13 @@ def executar_sistema():
                 descricao
             )
 
-                contador_id+=1
-                print('entrada registrada com sucesso.')
-            elif opcao == "2":
-                valor = float(input("Valor da saída: "))
-                descricao = input("Descrição: ")
-                data_hora = input("Data/Hora: ")
+            contador_id += 1
+            print("Entrada registrada com sucesso.")
+
+        elif opcao == "2":
+            valor = float(input("Valor da saída: "))
+            descricao = input("Descrição: ")
+            data_hora = input("Data/Hora: ")
 
             try:
                 banco = registrar_transacao(
@@ -173,4 +134,22 @@ def executar_sistema():
                 print("Saída registrada com sucesso.")
             except ValueError as erro:
                 print(f"Erro: {erro}")
-            
+
+        elif opcao == "3":
+            saldo = calcular_saldo(banco)
+            print(f"Saldo atual: R$ {saldo:.2f}")
+
+        elif opcao == "4":
+            listar_transacoes(banco)
+
+        else:
+            print("Opção inválida.")
+
+
+# ============================
+# PONTO DE ENTRADA DO SISTEMA
+# ============================
+
+if __name__ == "__main__":
+    print("🚀 Sistema iniciado com sucesso!")
+    executar_sistema()
