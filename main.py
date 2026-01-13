@@ -86,6 +86,69 @@ def registrar_transacao(banco,transacao_id,tipo,valor,data_hora,descricao):
      if tipo==TIPO_SAIDA:
             (saldo_atual,valor)
             nova_transacao=criar_transacao(transacao_id,tipo,valor,data_hora,descricao)
-            return banco+(nova_transacao,) 
-
+            return banco+(nova_transacao,)
      
+def exibir_menu():
+    print("\n=== SISTEMAA FINANCEIRO IMUTÁVEL === ")
+    print('1- REGISTRAR ENTRADA')
+    print('2- REGISTRAR SAÍDA')
+    print('3- VER SALDO')
+    print('4- VER HISTÓRICO')
+    print('0- SAIR')
+     
+def executar_sistema():
+    banco=()
+    contador_id=1
+
+    while True:
+            exibir_menu()
+            opcao=input('escolha uma opção:')
+
+            if opcao=="0":
+              print('Encerrando sistema...')
+              break
+            elif opcao == "1":
+                valor = float(input("Valor da entrada: "))
+                descricao = input("Descrição: ")
+                data_hora = input("Data/Hora: ")
+
+                banco = registrar_transacao(
+                banco,
+                contador_id,
+                TIPO_ENTRADA,
+                valor,
+                data_hora,
+                descricao
+            )
+
+                contador_id+=1
+                print('entrada registrada com sucesso.')
+            elif opcao == "2":
+                valor = float(input("Valor da saída: "))
+                descricao = input("Descrição: ")
+                data_hora = input("Data/Hora: ")
+
+            try:
+                banco = registrar_transacao(
+                    banco,
+                    contador_id,
+                    TIPO_SAIDA,
+                    valor,
+                    data_hora,
+                    descricao
+                )
+                contador_id += 1
+                print("Saída registrada com sucesso.")
+            except ValueError as erro:
+                print(f"Erro: {erro}")
+                    elif opcao == "3":
+            saldo = calcular_saldo(banco)
+            print(f"Saldo atual: R$ {saldo:.2f}")
+                elif opcao == "4":
+            if not banco:
+                print("Nenhuma transação registrada.")
+            else:
+                for transacao in banco:
+                    print(transacao)
+                if __name__ == "__main__":
+                    executar_sistema()
